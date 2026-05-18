@@ -171,13 +171,13 @@ impl MemWrite for Ram {
 
 // TODO: can we get rid of this empty impl? Currently required for bus writes.
 impl MemManage for Ram {
-    fn enable_lower_rom(&mut self, enable: bool) {}
+    fn enable_lower_rom(&mut self, _enable: bool) {}
 
-    fn enable_upper_rom(&mut self, enable: bool) {}
+    fn enable_upper_rom(&mut self, _enable: bool) {}
 
-    fn select_upper_rom(&mut self, upper_rom_nr: u8) {}
+    fn select_upper_rom(&mut self, _upper_rom_nr: u8) {}
 
-    fn force_ram_read(&mut self, force: bool) {}
+    fn force_ram_read(&mut self, _force: bool) {}
 }
 
 pub struct RamDebugView {

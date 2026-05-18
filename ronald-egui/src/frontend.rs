@@ -2,7 +2,6 @@ use std::{path::PathBuf, thread::spawn};
 
 use eframe::{egui, egui_wgpu};
 use egui::Vec2;
-use serde::{Deserialize, Serialize};
 use web_time::Instant;
 
 #[cfg(target_arch = "wasm32")]
@@ -12,7 +11,7 @@ use ronald_core::{
     AudioSink, Driver,
     constants::{SCREEN_BUFFER_HEIGHT, SCREEN_BUFFER_WIDTH},
     debug::{
-        breakpoint::{AnyBreakpoint, Breakpoint, BreakpointManager},
+        breakpoint::{AnyBreakpoint, BreakpointManager},
         view::SystemDebugView,
     },
     system::{SystemConfig, instruction::DecodedInstruction},
@@ -335,7 +334,7 @@ impl Frontend {
                 .load_disk(1, picked_file.image, picked_file.path_buf);
         }
 
-        if let Some(picked_file) = self.picked_file_tape.try_with_mut(|f| f.take()).flatten() {
+        if let Some(_picked_file) = self.picked_file_tape.try_with_mut(|f| f.take()).flatten() {
             todo!("handle tape loading");
         }
     }

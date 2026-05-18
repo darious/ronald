@@ -13,6 +13,7 @@ use crate::utils::vectorize;
 pub trait KeyMapStore: Default {
     fn load_key_map(&self) -> Result<KeyMap, Box<dyn std::error::Error>>;
     fn save_key_map(&self, keymap: &KeyMap) -> Result<(), Box<dyn std::error::Error>>;
+    #[allow(dead_code)] // called from key map editor; kept on the trait
     fn reset_key_map(&self) -> Result<KeyMap, Box<dyn std::error::Error>>;
 }
 
@@ -195,6 +196,7 @@ where
         Ok(())
     }
 
+    #[allow(dead_code)] // exposed for editor; tests cover it
     pub fn reset_all_bindings(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         let key_map = self.key_map_store.reset_key_map()?;
 

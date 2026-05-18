@@ -1,7 +1,4 @@
-use std::fmt::format;
-
 use eframe::egui;
-use ronald_core::debug::view::FdcDebugView;
 use serde::{Deserialize, Serialize};
 
 use ronald_core::debug::breakpoint::{AnyBreakpoint, Breakpoint};

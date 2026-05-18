@@ -184,7 +184,7 @@ impl Amstrad40007 {
 }
 
 impl GateArray for Amstrad40007 {
-    fn write_byte(&mut self, memory: &mut impl MemManage, port: u16, value: u8) {
+    fn write_byte(&mut self, memory: &mut impl MemManage, _port: u16, value: u8) {
         // TODO: remove port parameter?
         let function = (value >> 6) & 0x03;
 

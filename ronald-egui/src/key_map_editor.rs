@@ -188,7 +188,7 @@ impl KeyMapEditor {
                         self.listening = None;
                     }
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                        if let Some(host_key) = key_mapper.binding(hovered_key, shifted) {
+                        if let Some(_host_key) = key_mapper.binding(hovered_key, shifted) {
                             if ui.button("Clear Binding").clicked() {
                                 let _ = key_mapper.clear_binding(hovered_key, shifted);
                             }

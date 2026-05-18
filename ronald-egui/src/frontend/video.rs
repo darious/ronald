@@ -8,6 +8,7 @@ use ronald_core::constants::{SCREEN_BUFFER_HEIGHT, SCREEN_BUFFER_WIDTH};
 pub struct EguiWgpuVideo {
     queue: wgpu::Queue,
     texture: wgpu::Texture,
+    #[allow(dead_code)] // retained for GPU resource lifetime
     texture_view: wgpu::TextureView,
     framebuffer_texture_id: egui::TextureId,
 }

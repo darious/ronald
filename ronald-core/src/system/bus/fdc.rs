@@ -1,3 +1,6 @@
+// WIP from upstream fdc-overhaul: destructured command parameters not yet wired up.
+#![allow(unused_variables, dead_code)]
+
 use std::path::PathBuf;
 use std::{collections::VecDeque, fmt::Display};
 
@@ -1265,13 +1268,13 @@ impl FloppyDiskController {
         deleted: bool,
     ) -> CommandResult {
         if multi_track {
-            log::error!("Unsupported multi-track flag set");
+            log::debug!("Unsupported multi-track flag set; ignoring");
         }
         if let Mode::FrequencyModulation = mode {
-            log::error!("Unsupported frequency modulation mode");
+            log::debug!("Unsupported frequency modulation mode; ignoring");
         }
         if skip {
-            log::error!("Unsupported skip flag set");
+            log::debug!("Unsupported skip flag set; ignoring");
         }
         if head != 0 {
             log::error!("Unsupported head number");

@@ -241,7 +241,7 @@ where
         });
     }
 
-    fn initialize_frontend(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
+    fn initialize_frontend(&mut self, _ctx: &egui::Context, frame: &mut eframe::Frame) {
         if let (Some(render_state), None) = (&frame.wgpu_render_state, &self.frontend) {
             // On WASM, show a welcome modal to work around the fact that browser audio contexts
             // cannot be started without user interaction.

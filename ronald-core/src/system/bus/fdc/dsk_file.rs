@@ -141,6 +141,7 @@ impl Disk {
         Ok(disk)
     }
 
+    #[allow(dead_code)]
     pub fn find_track_index(&self, track: u8, side: u8) -> Option<usize> {
         // TODO: handle out of bounds errors
         Some((track * self.num_sides + side) as usize)

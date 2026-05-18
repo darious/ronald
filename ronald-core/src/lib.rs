@@ -104,7 +104,7 @@ impl Driver {
         todo!()
     }
 
-    pub fn load_snapshot(&self, rom: Vec<u8>) {
+    pub fn load_snapshot(&self, _rom: Vec<u8>) {
         todo!()
     }
 

@@ -8,6 +8,7 @@ use crate::debug::DebugSource;
 use crate::debug::Debuggable;
 use crate::debug::Snapshottable;
 use crate::system::clock::MasterClockTick;
+use crate::system::CpcModel;
 
 pub trait MemRead {
     fn read_byte(&self, address: usize) -> u8;
@@ -213,21 +214,32 @@ pub struct MemoryCpcX64 {
 }
 
 impl MemoryCpcX64 {
-    pub fn new() -> Self {
-        // TODO: receive rom paths as parameters
+    pub fn new(model: CpcModel) -> Self {
+        let (lower_rom, basic_rom): (&[u8], &[u8]) = match model {
+            CpcModel::Cpc464 => (
+                include_bytes!("../../rom/os_464.rom"),
+                include_bytes!("../../rom/basic_1.0.rom"),
+            ),
+            CpcModel::Cpc664 => (
+                include_bytes!("../../rom/os_664.rom"),
+                include_bytes!("../../rom/basic_664.rom"),
+            ),
+            CpcModel::Cpc6128 => (
+                include_bytes!("../../rom/os_6128.rom"),
+                include_bytes!("../../rom/basic_6128.rom"),
+            ),
+        };
+
         let mut upper_roms = HashMap::new();
-        upper_roms.insert(
-            0,
-            Rom::from_bytes(include_bytes!("../../rom/basic_1.0.rom")),
-        );
+        upper_roms.insert(0, Rom::from_bytes(basic_rom));
         upper_roms.insert(
             7,
-            Rom::from_bytes(include_bytes!("../../rom/amsdos_0.5.rom")),
+            Rom::from_bytes(include_bytes!("../../rom/amsdos.rom")),
         );
 
         MemoryCpcX64 {
             ram: Ram::new(0x10000),
-            lower_rom: Rom::from_bytes(include_bytes!("../../rom/os_464.rom")),
+            lower_rom: Rom::from_bytes(lower_rom),
             lower_rom_enabled: true,
             upper_roms,
             selected_upper_rom: 0,
@@ -239,7 +251,7 @@ impl MemoryCpcX64 {
 
 impl Default for MemoryCpcX64 {
     fn default() -> Self {
-        Self::new()
+        Self::new(CpcModel::Cpc464)
     }
 }
 
@@ -352,7 +364,7 @@ pub struct MemoryCpc6128 {
 impl MemoryCpc6128 {
     pub fn new() -> Self {
         MemoryCpc6128 {
-            memory: MemoryCpcX64::new(),
+            memory: MemoryCpcX64::new(CpcModel::Cpc6128),
         }
     }
 }

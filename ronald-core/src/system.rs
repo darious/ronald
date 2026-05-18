@@ -227,8 +227,9 @@ where
     fn from(config: SystemConfig) -> Self {
         // Select memory implementation based on model
         let memory = match config.model {
-            CpcModel::Cpc464 => AnyMemory::CpcX64(MemoryCpcX64::default()),
-            CpcModel::Cpc664 => AnyMemory::CpcX64(MemoryCpcX64::default()),
+            CpcModel::Cpc464 | CpcModel::Cpc664 => {
+                AnyMemory::CpcX64(MemoryCpcX64::new(config.model))
+            }
             CpcModel::Cpc6128 => AnyMemory::Cpc6128(MemoryCpc6128::default()),
         };
 

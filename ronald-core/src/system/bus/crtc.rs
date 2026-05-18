@@ -108,17 +108,21 @@ pub struct HitachiHd6845s {
 
 impl HitachiHd6845s {
     fn select_register(&mut self, register: usize) {
-        self.selected_register = register;
-        self.emit_debug_event(
-            CrtcDebugEvent::RegisterSelected {
-                register: Register::try_from(register).expect("Invalid CRTC register selected"),
-            },
-            self.master_clock,
-        );
+        // 6845 latches 5 bits of the register-select port.
+        self.selected_register = register & 0x1F;
+        if let Ok(reg) = Register::try_from(self.selected_register) {
+            self.emit_debug_event(
+                CrtcDebugEvent::RegisterSelected { register: reg },
+                self.master_clock,
+            );
+        }
     }
 
     fn write_register(&mut self, value: u8) {
-        // TODO: restrict to writable registers
+        // Real CRTC ignores writes to registers above 17.
+        if self.selected_register >= self.registers.len() {
+            return;
+        }
         let was = self.registers[self.selected_register];
         self.registers[self.selected_register] = value;
 
@@ -133,8 +137,11 @@ impl HitachiHd6845s {
     }
 
     fn read_register(&self) -> u8 {
-        // TODO: restrict to readable registers
-        // TODO: handle type 4 reads (see https://www.cpcwiki.eu/index.php/Extra_CPC_Plus_Hardware_Information#CRTC)
+        // Reads of registers >= 18 return 0 on Type 0/1/2; real CPC Plus has
+        // different read-back rules. TODO: handle type 4 reads.
+        if self.selected_register >= self.registers.len() {
+            return 0;
+        }
         self.registers[self.selected_register]
     }
 }
@@ -168,7 +175,13 @@ impl CrtController for HitachiHd6845s {
         let function = (port >> 8) & 0x03;
 
         match function {
-            2 => todo!("handle read depending on CRTC type"),
+            2 => {
+                // CRTC type-2 returns the status register; types 0/1 return
+                // floating-bus garbage. Return 0xFF for now until we model
+                // type-specific behaviour.
+                log::trace!("CRTC function 2 (status) read; returning 0xFF");
+                0xFF
+            }
             3 => self.read_register(),
             _ => 0xff, // TODO: properly emulate floating bus
         }
@@ -178,7 +191,7 @@ impl CrtController for HitachiHd6845s {
         let function = (port >> 8) & 0x03;
 
         match function {
-            0 => self.select_register(value as usize),
+            0 => self.select_register((value & 0x1F) as usize),
             1 => self.write_register(value),
             _ => (),
         }

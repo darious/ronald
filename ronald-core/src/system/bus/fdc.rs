@@ -147,7 +147,11 @@ impl FloppyDiskController {
                             log::trace!("Reading data from FDC: {data:#04X}");
                             data
                         } else {
-                            unreachable!()
+                            log::warn!("FDC data read with empty execution buffer; returning 0xFF");
+                            self.execution_mode = false;
+                            self.floppy_controller_busy = false;
+                            self.phase = Phase::Command;
+                            return 0xFF;
                         };
 
                         if self.data_buffer.is_empty() {
@@ -162,8 +166,11 @@ impl FloppyDiskController {
                             log::debug!("Reading result from FDC: {result:#04X}");
                             result
                         } else {
-                            // TODO: we hit this if no disk is loaded and CAT is executed
-                            unreachable!()
+                            log::warn!("FDC result read with empty buffer; returning 0xFF");
+                            self.data_input_output = false;
+                            self.floppy_controller_busy = false;
+                            self.phase = Phase::Command;
+                            return 0xFF;
                         };
 
                         if self.result_buffer.is_empty() {
@@ -175,8 +182,8 @@ impl FloppyDiskController {
                         result
                     }
                     Phase::Command => {
-                        log::error!("Unexpected FDC read in command phase");
-                        unreachable!() // TODO: return dummy value instead?
+                        log::error!("Unexpected FDC read in command phase; returning 0xFF");
+                        return 0xFF;
                     }
                 }
             }
@@ -315,6 +322,8 @@ impl FloppyDiskController {
                         }
                         None => {
                             self.drive_not_ready = true;
+                            self.write_standard_result();
+                            self.data_input_output = true;
                             self.phase = Phase::Result;
                         }
                     }
@@ -498,7 +507,18 @@ impl FloppyDiskController {
                 self.result_buffer.push_back(sector_info.sector_id);
                 self.result_buffer.push_back(sector_info.sector_size);
             }
-            None => unreachable!(),
+            None => {
+                // No disk: echo the addressed CHRN from parameters so AMSDOS
+                // sees a complete 7-byte result with drive_not_ready set in ST0.
+                let track = self.parameters_buffer.first().copied().unwrap_or(0);
+                let side = self.parameters_buffer.get(1).copied().unwrap_or(0);
+                let sector_id = self.parameters_buffer.get(3).copied().unwrap_or(0);
+                let sector_size = self.parameters_buffer.get(4).copied().unwrap_or(0);
+                self.result_buffer.push_back(track);
+                self.result_buffer.push_back(side);
+                self.result_buffer.push_back(sector_id);
+                self.result_buffer.push_back(sector_size);
+            }
         }
     }
 }

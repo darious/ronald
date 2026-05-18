@@ -1210,6 +1210,7 @@ mod gui_tests {
     use ronald_core::debug::breakpoint::{
         CrtcAddressBreakpoint, CrtcCountersBreakpoint, CrtcRegisterWriteBreakpoint,
     };
+    use ronald_core::system::bus::crtc::Register as CrtcRegister;
 
     use crate::debug::mock::TestDebugger;
 

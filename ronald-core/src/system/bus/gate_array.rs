@@ -256,10 +256,19 @@ impl GateArray for Amstrad40007 {
                 }
             }
             3 => {
-                // ROM banking (only available in CPC 6128)
-                // TODO: show error message to user
-                log::error!("Gate Array ROM banking not supported: {value:#010b}");
-                unimplemented!();
+                // RAM/ROM banking (6128). Bits 0..2 select the 8-bank RAM
+                // configuration; bits 3..5 (upper-ROM bank select for ROM
+                // expansion boards) are not yet implemented.
+                let ram_config = value & 0x07;
+                memory.set_ram_config(ram_config);
+                log::trace!(
+                    "Gate Array RAM config = {ram_config} (raw {value:#010b})"
+                );
+                if value & 0x38 != 0 {
+                    log::debug!(
+                        "Gate Array upper-ROM bank-select bits ignored: {value:#010b}"
+                    );
+                }
             }
             _ => {
                 unreachable!();

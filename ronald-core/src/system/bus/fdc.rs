@@ -1,5 +1,5 @@
 // WIP from upstream fdc-overhaul: destructured command parameters not yet wired up.
-#![allow(unused_variables, dead_code)]
+#![allow(unused_variables, dead_code, unused_imports)]
 
 use std::path::PathBuf;
 use std::{collections::VecDeque, fmt::Display};
